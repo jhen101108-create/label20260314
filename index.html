@@ -3,73 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>實驗室標籤旗艦系統</title>
+    <title>實驗室標籤漫畫旗艦版</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <style id="dynamicPageSize"></style>
 
     <style>
-        body { font-family: 'Segoe UI', Tahoma, '微軟正黑體', sans-serif; background-color: #e9ecef; padding: 15px 10px; margin: 0; color: #333; display: flex; justify-content: center; }
-        .ui-container { width: 100%; max-width: 420px; background: #ffffff; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { text-align: center; font-size: 20px; font-weight: bold; margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; color: #2c3e50; }
+        /* 🎨 日式漫畫原稿風格 (網點背景 + 粗黑線條) */
+        body { 
+            font-family: 'Nunito', 'M PLUS Rounded 1c', '微軟正黑體', sans-serif; 
+            background-color: #f4f4f4; 
+            /* 漫畫網點背景 */
+            background-image: radial-gradient(#d5d5d5 1.5px, transparent 1.5px);
+            background-size: 15px 15px;
+            padding: 15px 10px; margin: 0; color: #222; display: flex; justify-content: center; 
+        }
+        
+        .ui-container { 
+            width: 100%; max-width: 420px; 
+            background: #ffffff; 
+            padding: 15px; 
+            border-radius: 12px; 
+            border: 3px solid #222; /* 漫畫分鏡粗框 */
+            box-shadow: 6px 6px 0px #222; /* 漫畫風強陰影 */
+        }
+        
+        h2 { text-align: center; font-size: 22px; font-weight: 900; margin-top: 0; border-bottom: 3px dashed #222; padding-bottom: 10px; color: #222; letter-spacing: 1px;}
         
         .form-group { margin-bottom: 10px; }
-        label { display: block; font-weight: bold; margin-bottom: 4px; font-size: 13px; color: #34495e; }
+        label { display: block; font-weight: bold; margin-bottom: 4px; font-size: 13px; color: #222; }
         
-        input, select { width: 100%; padding: 8px 10px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; font-size: 14px; background-color: #f8f9fa; font-family: inherit;}
-        input:focus, select:focus { outline: none; border-color: #3498db; background-color: #fff; box-shadow: 0 0 0 2px rgba(52,152,219,0.2); }
+        /* 手繪風輸入框 */
+        input, select { 
+            width: 100%; padding: 8px 10px; 
+            border: 2px solid #222; 
+            border-radius: 6px; box-sizing: border-box; font-size: 14px; 
+            background-color: #fafafa; font-family: inherit; font-weight: bold;
+        }
+        input:focus, select:focus { outline: none; background-color: #fff; box-shadow: 3px 3px 0px #ffeaa7; transform: translate(-1px, -1px); transition: 0.1s;}
+        
         .row { display: flex; gap: 8px; }
         .row .form-group { flex: 1; }
-        .combo-box select { margin-bottom: 4px; background-color: #e8f4f8; color: #0984e3; font-weight: bold; border: 1px solid #74b9ff; cursor: pointer; }
-        .btn-small { width: auto; flex: none; padding: 4px 8px; font-size: 12px; margin-top: 0; border-radius: 4px; color: #fff; border: none; cursor: pointer;}
-        .btn-today { background-color: #e74c3c; }
-        .btn-size { background-color: #9b59b6; }
+        .combo-box select { margin-bottom: 4px; background-color: #fff; color: #222; cursor: pointer; }
         
-        .tabs { display: flex; margin-top: 15px; border-bottom: 2px solid #3498db; }
-        .tab-btn { flex: 1; text-align: center; padding: 8px 4px; cursor: pointer; background: #ecf0f1; font-weight: bold; font-size: 13px; color: #7f8c8d; border-radius: 8px 8px 0 0; transition: 0.3s; margin: 0 1px; }
-        .tab-btn.active { background: #3498db; color: #fff; }
+        /* 漫畫風按鈕 */
+        .btn-small { width: auto; flex: none; padding: 4px 8px; font-size: 12px; margin-top: 0; border-radius: 4px; color: #222; background: #fff; border: 2px solid #222; cursor: pointer; font-weight: bold; box-shadow: 2px 2px 0px #222;}
+        .btn-small:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px #222; }
+        .btn-today { background-color: #ff7675; }
+        .btn-size { background-color: #74b9ff; }
+        
+        .tabs { display: flex; margin-top: 15px; border-bottom: 3px solid #222; }
+        .tab-btn { flex: 1; text-align: center; padding: 8px 4px; cursor: pointer; background: #f0f0f0; font-weight: bold; font-size: 13px; color: #555; border: 2px solid #222; border-bottom: none; border-radius: 8px 8px 0 0; margin: 0 2px; }
+        .tab-btn.active { background: #222; color: #fff; }
         .tab-content { display: none; padding: 15px 0 0 0; }
         .tab-content.active { display: block; }
 
-        .sop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .btn-sop { padding: 10px 4px; font-size: 13px; font-weight: bold; color: white; border: none; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .btn-sop:active { transform: scale(0.97); box-shadow: none; }
-        .bg-sys { background: #34495e; } .bg-spec { background: #8e44ad; } .bg-lin { background: #2980b9; } 
-        .bg-acc { background: #c0392b; } .bg-prec { background: #27ae60; } .bg-stab { background: #d35400; } .bg-lim { background: #7f8c8d; }
-        .bg-rt1 { background: #16a085; } .bg-rt2 { background: #2980b9; } .bg-rt3 { background: #8e44ad; } .bg-rt4 { background: #f39c12; }
-
-        .transfer-box { background: #e8f4f8; border: 2px dashed #3498db; padding: 10px; border-radius: 8px; margin-top: 15px; }
-        .transfer-title { text-align: center; font-size: 13px; font-weight: bold; color: #2980b9; margin-bottom: 8px; }
-        .action-group { display: flex; flex-wrap: wrap; gap: 6px; }
-        /* 調整傳輸按鈕大小適應三個選項 */
-        .btn-action { flex: 1 1 30%; padding: 10px 4px; color: #fff; border: none; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        .btn-action:active { transform: scale(0.97); }
-        .btn-qr { background-color: #8e44ad; }
-        .btn-json { background-color: #f39c12; }
+        .sop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-sop { padding: 10px 4px; font-size: 13px; font-weight: 900; color: #222; background: #fff; border: 2px solid #222; border-radius: 6px; cursor: pointer; box-shadow: 3px 3px 0px #222; transition: 0.1s; }
+        .btn-sop:active { transform: translate(3px, 3px); box-shadow: 0px 0px 0px #222; }
         
-        .main-actions { display: flex; gap: 8px; margin-top: 10px; }
-        .btn-print { background-color: #2ecc71; flex: 2; padding: 12px; font-size: 15px; border-radius: 6px; color: white; border: none; font-weight: bold; cursor: pointer;} 
-        .btn-clear { background-color: #e74c3c; flex: 1; border-radius: 6px; color: white; border: none; font-weight: bold; cursor: pointer;}
+        /* 賦予按鈕不同馬卡龍色系，印出來不影響黑白 */
+        .bg-sys { background: #fab1a0; } .bg-spec { background: #81ecec; } .bg-lin { background: #74b9ff; } 
+        .bg-acc { background: #a29bfe; } .bg-prec { background: #55efc4; } .bg-stab { background: #ffeaa7; } .bg-lim { background: #dfe6e9; }
+        .bg-rt1 { background: #55efc4; } .bg-rt2 { background: #74b9ff; } .bg-rt3 { background: #a29bfe; } .bg-rt4 { background: #ffeaa7; }
+
+        .transfer-box { background: #fff; border: 2px dashed #222; padding: 10px; border-radius: 8px; margin-top: 15px; }
+        .transfer-title { text-align: center; font-size: 14px; font-weight: 900; color: #222; margin-bottom: 8px; }
+        .action-group { display: flex; flex-wrap: wrap; gap: 8px; }
+        .btn-action { flex: 1 1 30%; padding: 10px 4px; color: #222; border: 2px solid #222; background: #fff; border-radius: 6px; font-size: 12px; font-weight: 900; cursor: pointer; box-shadow: 2px 2px 0px #222; transition: 0.1s;}
+        .btn-action:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px #222; }
+        
+        .main-actions { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-print { background-color: #55efc4; flex: 2; padding: 12px; font-size: 16px; border-radius: 6px; color: #222; border: 2px solid #222; font-weight: 900; cursor: pointer; box-shadow: 3px 3px 0px #222;} 
+        .btn-print:active { transform: translate(3px, 3px); box-shadow: 0px 0px 0px #222;}
+        .btn-clear { background-color: #ff7675; flex: 1; border-radius: 6px; color: #222; border: 2px solid #222; font-weight: 900; cursor: pointer; box-shadow: 3px 3px 0px #222;}
+        .btn-clear:active { transform: translate(3px, 3px); box-shadow: 0px 0px 0px #222;}
 
         #printArea { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 15px; }
-        .label-box { background: white; border: 1px dashed #e74c3c; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; color: black; }
-        .btn-delete { position: absolute; top: 2px; right: 2px; background: #e74c3c; color: white; border: none; border-radius: 4px; width: 20px; height: 20px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
-
-        /* 🌟 彈窗通用樣式 */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 0 20px rgba(255,255,255,0.2); text-align: center; }
-        .btn-close-modal { padding: 10px 30px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; background: #e74c3c; color: white; cursor: pointer; }
         
-        /* 鏡頭掃描專用 */
-        #videoElement { width: 100%; max-width: 350px; border-radius: 8px; transform: scaleX(-1); } /* 鏡像翻轉，方便對準 */
+        /* 預覽區淺灰虛線，列印時消失 */
+        .label-box { background: white; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; color: black; border: 1px dashed #aaa; }
+        .btn-delete { position: absolute; top: 2px; right: 2px; background: #ff7675; color: #222; border: 2px solid #222; border-radius: 4px; width: 22px; height: 22px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 15px; border-radius: 8px; border: 3px solid #222; margin-bottom: 20px; box-shadow: 8px 8px 0px #ff7675; text-align: center; }
+        .btn-close-modal { padding: 10px 30px; font-size: 16px; font-weight: 900; border: 2px solid #222; border-radius: 8px; background: #ff7675; color: #222; cursor: pointer; box-shadow: 4px 4px 0px #222;}
+        #videoElement { width: 100%; max-width: 350px; border-radius: 8px; border: 2px solid #222; transform: scaleX(-1); } 
 
         @media print {
             body { background: white; margin: 0; padding: 0; }
             .hide-on-print { display: none !important; }
             .ui-container { max-width: none; background: transparent; padding: 0; border: none; box-shadow: none; }
             #printArea { display: block; margin: 0; }
-            .label-box { border: none; page-break-after: always; margin: 0; }
+            .label-box { border: none !important; page-break-after: always; margin: 0; }
         }
     </style>
 </head>
@@ -77,12 +104,12 @@
 
 <div class="ui-container">
     <div class="hide-on-print">
-        <h2>🧪 實驗室標籤旗艦系統</h2>
+        <h2>🧪 實驗室標籤大師</h2>
         
-        <div style="background: #fdfbf7; padding: 10px; border-radius: 8px; border: 1px solid #e2d9c8;">
+        <div style="background: #fff; padding: 12px; border-radius: 8px; border: 2px solid #222; box-shadow: 3px 3px 0 #eee;">
             <div class="row">
                 <div class="form-group"><label>👤 人員</label><input type="text" id="userName" placeholder="詠"></div>
-                <div class="form-group"><label>🏷️ 批號</label><input type="text" id="code" value="TA03"></div>
+                <div class="form-group"><label>🏷️ 產品名稱</label><input type="text" id="code" value="TA03" placeholder="TA03"></div>
             </div>
             <div class="row">
                 <div class="form-group"><label>📅 配製</label><div style="display: flex; gap: 4px;"><input type="text" id="prepDate"><button class="btn-small btn-today" onclick="setToday()">今</button></div></div>
@@ -99,7 +126,7 @@
         </div>
 
         <div class="tabs">
-            <div class="tab-btn active" onclick="switchTab(1)">📝 自訂</div>
+            <div class="tab-btn active" onclick="switchTab(1)">📝 自訂單張</div>
             <div class="tab-btn" onclick="switchTab(2)">🚀 確效專區</div>
             <div class="tab-btn" onclick="switchTab(3)">🧪 日常檢驗</div>
         </div>
@@ -120,7 +147,7 @@
                 <div class="form-group"><label>🖨️ 印幾張</label><input type="number" id="printCount" value="1" min="1"></div>
             </div>
             <div class="form-group"><label>💧 濃度</label><input type="text" id="conc"></div>
-            <button class="btn-action" style="width: 100%; margin-top: 10px; background-color: #3498db;" onclick="addCustomLabel()">➕ 加入預覽列</button>
+            <button class="btn-action" style="width: 100%; margin-top: 10px; background-color: #74b9ff;" onclick="addCustomLabel()">➕ 加入預覽列</button>
         </div>
 
         <div id="tab2" class="tab-content">
@@ -156,14 +183,14 @@
 
         <div class="transfer-box">
             <div class="transfer-title">📡 資料傳送門 (手機 ⇆ 電腦)</div>
-            <div class="action-group" style="margin-bottom: 5px;">
-                <button class="btn-action btn-qr" style="flex: 1 1 100%; font-size: 14px; background:#9b59b6;" onclick="generateQR()">📲 1.手機：產生分享 QR 碼</button>
+            <div class="action-group" style="margin-bottom: 8px;">
+                <button class="btn-action" style="flex: 1 1 100%; font-size: 14px; background:#a29bfe;" onclick="generateQR()">📲 1.手機：產生分享 QR 碼</button>
             </div>
             <div class="action-group">
-                <button class="btn-action btn-qr" onclick="startScanner()">📹 2.電腦：開啟鏡頭掃描</button>
-                <button class="btn-action btn-qr" style="background:#8e44ad;" onclick="document.getElementById('qrImageInput').click()">🖼️ 2.電腦：讀圖片備案</button>
-                <button class="btn-action btn-json" onclick="exportJSON()">💾 導 JSON</button>
-                <button class="btn-action btn-json" onclick="document.getElementById('jsonInput').click()">📂 讀 JSON</button>
+                <button class="btn-action" style="background:#81ecec;" onclick="startScanner()">📹 2.開啟鏡頭</button>
+                <button class="btn-action" style="background:#74b9ff;" onclick="document.getElementById('qrImageInput').click()">🖼️ 2.讀圖備案</button>
+                <button class="btn-action" style="background:#fab1a0;" onclick="exportJSON()">💾 導 JSON</button>
+                <button class="btn-action" style="background:#ffeaa7;" onclick="document.getElementById('jsonInput').click()">📂 讀 JSON</button>
             </div>
         </div>
 
@@ -184,10 +211,10 @@
 
 <div id="scannerModal" class="modal">
     <div style="color: white; margin-bottom: 10px; font-weight: bold; text-align: center; font-size: 18px;">正在尋找 QR Code...</div>
-    <div class="modal-content" style="padding: 5px; background: #333;">
+    <div class="modal-content" style="padding: 5px; background: #222;">
         <video id="videoElement" autoplay playsinline></video>
     </div>
-    <div style="color: #f1c40f; margin-bottom: 15px; font-size: 12px;">請將手機畫面上的條碼對準鏡頭</div>
+    <div style="color: #ffeaa7; margin-bottom: 15px; font-size: 13px; font-weight: bold;">請將手機畫面上的條碼對準鏡頭</div>
     <button class="btn-close-modal" onclick="stopScanner()">取消掃描</button>
 </div>
 
@@ -195,6 +222,34 @@
     let globalLabels = [];
     let videoStream = null;
     let scanningActive = false;
+
+    // 🌟 16 種純向量空心圖案 (保證黑白印表機完美呈現，且無一重複)
+    // 包含：愛心、星星、雲朵、月亮、水滴、三角、鑽石、六角、方塊、圓圈、盾牌、笑臉、燒杯、葉子、旗幟、咖啡杯
+    const svgLib = [
+        '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>',
+        '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>',
+        '<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>',
+        '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>',
+        '<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>',
+        '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>',
+        '<polygon points="12 2 22 12 12 22 2 12"></polygon>',
+        '<polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"></polygon>',
+        '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>',
+        '<circle cx="12" cy="12" r="10"></circle>',
+        '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>',
+        '<circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line>',
+        '<path d="M10 2v7.5l-8 10.5a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3l-8-10.5V2 m-1.5 0h7 m-9.5 12h14"></path>',
+        '<path d="M11 20A7 7 0 0 1 4 13V9a1 1 0 0 1 1-1h4a7 7 0 0 1 7 7v4a1 1 0 0 1-1 1z"></path>',
+        '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line>',
+        '<path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line>'
+    ];
+
+    function getSvgIcon(indexStr) {
+        if (indexStr === "") return "";
+        let idx = parseInt(indexStr) % 16;
+        // 使用 SVG 確保在黑白列印下線條銳利且完全空心
+        return `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;">${svgLib[idx]}</svg>`;
+    }
 
     window.onload = function() {
         const savedName = localStorage.getItem("labUserName");
@@ -219,49 +274,119 @@
 
     function fillInput(i, v) { if (v) document.getElementById(i).value = v; document.getElementById(i + "Select").selectedIndex = 0; }
 
+    function getBaseCode() { return document.getElementById("code").value.trim(); }
+
     function addCustomLabel() {
         const item = document.getElementById("item").value.trim(), conc = document.getElementById("conc").value.trim();
         const sampleType = document.getElementById("sampleType").value.trim(), startNumStr = document.getElementById("startNum").value.trim();
         const count = parseInt(document.getElementById("printCount").value) || 1;
-        for (let i = 0; i < count; i++) globalLabels.push({ item: item, sample: sampleType ? `${sampleType}${startNumStr !== "" ? parseInt(startNumStr) + i : ""}` : "", conc: conc });
+        const baseCode = getBaseCode();
+
+        for (let i = 0; i < count; i++) {
+            globalLabels.push({ code: baseCode, item: item, sample: sampleType ? `${sampleType}${startNumStr !== "" ? parseInt(startNumStr) + i : ""}` : "", conc: conc, symbol: "", symPos: "" });
+        }
         renderPreview();
     }
 
     function addSOP(type) {
         let inputs = []; 
+        let bc = getBaseCode();
         switch(type) {
-            case 'system': let sysStock = prompt("【System】有幾瓶 STD stock？(若無填0)", "1"); if (sysStock === null) return; for(let i=1; i<=parseInt(sysStock||0); i++) inputs.push({item: "System", sample: `STD stock ${i}`, conc: ""}); inputs.push({item: "System", sample: "STD", conc: ""}); break;
-            case 'specificity': inputs.push({item: "specificity", sample: "Blank", conc: ""}); let pStock = prompt("【Specificity】Placebo stock 瓶數？(若無填0)", "1"); if (pStock === null) return; for(let i=1; i<=parseInt(pStock||0); i++) inputs.push({item: "specificity", sample: `Placebo stock ${i}`, conc: ""}); inputs.push({item: "specificity", sample: "Placebo", conc: ""}); let sStock = prompt("【Specificity】Sa stock 瓶數？(若無填0)", "1"); if (sStock === null) return; for(let i=1; i<=parseInt(sStock||0); i++) inputs.push({item: "specificity", sample: `Sa stock ${i}`, conc: ""}); inputs.push({item: "specificity", sample: "Sa", conc: ""}); break;
-            case 'linearity': let linStock = prompt("【Linearity】API stock 瓶數？(若無填0)", "1"); if (linStock === null) return; for(let i=1; i<=parseInt(linStock||0); i++) inputs.push({item: "linearity", sample: `stock ${i}`, conc: ""}); let linConcs = prompt("請輸入 5 個線性濃度 (用逗號分隔)：", "50,75,100,125,150"); if (linConcs === null) return; let linArr = linConcs.split(","); for(let i=0; i<5; i++) inputs.push({item: "linearity", sample: `Level ${i+1}`, conc: linArr[i] ? linArr[i].trim() : ""}); break;
-            case 'accuracy': let accApi = prompt("【Accuracy】API stock 瓶數？(若無填0)", "1"); if (accApi === null) return; for(let i=1; i<=parseInt(accApi||0); i++) inputs.push({item: "accuracy", sample: `API stock ${i}`, conc: ""}); let accPla = prompt("【Accuracy】Placebo stock 瓶數？(若無填0)", "1"); if (accPla === null) return; for(let i=1; i<=parseInt(accPla||0); i++) inputs.push({item: "accuracy", sample: `Placebo stock ${i}`, conc: ""}); let accConcs = prompt("3 個準確度濃度 (用逗號分隔)：", "80%,100%,120%"); if (accConcs === null) return; let accArr = accConcs.split(","); for(let i=0; i<3; i++) for(let j=0; j<3; j++) inputs.push({item: "accuracy", sample: `Sa${j+1}`, conc: accArr[i] ? accArr[i].trim() : ""}); break;
-            case 'precision': for(let i=1; i<=6; i++) inputs.push({item: "precision", sample: `Sa${i}`, conc: ""}); break;
-            case 'intermediate': for(let i=1; i<=6; i++) inputs.push({item: "intermediate precision", sample: `Sa${i}`, conc: ""}); break;
-            case 'stability': let stabStd = prompt("【Stability】STD stock 瓶數？(若無填0)", "1"); if (stabStd === null) return; for(let i=1; i<=parseInt(stabStd||0); i++) inputs.push({item: "solution stability", sample: `STD stock ${i}`, conc: ""}); inputs.push({item: "solution stability", sample: "STD", conc: ""}); let stabSa = prompt("【Stability】Sa stock 瓶數？(若無填0)", "1"); if (stabSa === null) return; for(let i=1; i<=parseInt(stabSa||0); i++) inputs.push({item: "solution stability", sample: `Sa stock ${i}`, conc: ""}); inputs.push({item: "solution stability", sample: "Sa", conc: ""}); break;
-            case 'lod': let lodCnt = prompt("【LOD】LOD stock 瓶數？(若無填0)", "1"); if (lodCnt === null) return; for(let i=1; i<=parseInt(lodCnt||0); i++) inputs.push({item: "LOD", sample: `LOD stock ${i}`, conc: ""}); inputs.push({item: "LOD", sample: "LOD", conc: ""}); break;
-            case 'loq': let loqCnt = prompt("【LOQ】LOQ stock 瓶數？(若無填0)", "1"); if (loqCnt === null) return; for(let i=1; i<=parseInt(loqCnt||0); i++) inputs.push({item: "LOQ", sample: `LOQ stock ${i}`, conc: ""}); inputs.push({item: "LOQ", sample: "LOQ", conc: ""}); break;
+            case 'system': let sysStock = prompt("【System】有幾瓶 STD stock？(若無填0)", "1"); if (sysStock === null) return; for(let i=1; i<=parseInt(sysStock||0); i++) inputs.push({code: bc, item: "System", sample: `STD stock ${i}`, conc: "", symbol: "", symPos: ""}); inputs.push({code: bc, item: "System", sample: "STD", conc: "", symbol: "", symPos: ""}); break;
+            case 'specificity': inputs.push({code: bc, item: "specificity", sample: "Blank", conc: "", symbol: "", symPos: ""}); let pStock = prompt("【Specificity】Placebo stock 瓶數？(若無填0)", "1"); if (pStock === null) return; for(let i=1; i<=parseInt(pStock||0); i++) inputs.push({code: bc, item: "specificity", sample: `Placebo stock ${i}`, conc: "", symbol: "", symPos: ""}); inputs.push({code: bc, item: "specificity", sample: "Placebo", conc: "", symbol: "", symPos: ""}); let sStock = prompt("【Specificity】Sa stock 瓶數？(若無填0)", "1"); if (sStock === null) return; for(let i=1; i<=parseInt(sStock||0); i++) inputs.push({code: bc, item: "specificity", sample: `Sa stock ${i}`, conc: "", symbol: "", symPos: ""}); inputs.push({code: bc, item: "specificity", sample: "Sa", conc: "", symbol: "", symPos: ""}); break;
+            case 'linearity': let linStock = prompt("【Linearity】API stock 瓶數？(若無填0)", "1"); if (linStock === null) return; for(let i=1; i<=parseInt(linStock||0); i++) inputs.push({code: bc, item: "linearity", sample: `stock ${i}`, conc: "", symbol: "", symPos: ""}); let linConcs = prompt("請輸入 5 個線性濃度 (用逗號分隔)：", "50,75,100,125,150"); if (linConcs === null) return; let linArr = linConcs.split(","); for(let i=0; i<5; i++) inputs.push({code: bc, item: "linearity", sample: `Level ${i+1}`, conc: linArr[i] ? linArr[i].trim() : "", symbol: "", symPos: ""}); break;
+            case 'accuracy': let accApi = prompt("【Accuracy】API stock 瓶數？(若無填0)", "1"); if (accApi === null) return; for(let i=1; i<=parseInt(accApi||0); i++) inputs.push({code: bc, item: "accuracy", sample: `API stock ${i}`, conc: "", symbol: "", symPos: ""}); let accPla = prompt("【Accuracy】Placebo stock 瓶數？(若無填0)", "1"); if (accPla === null) return; for(let i=1; i<=parseInt(accPla||0); i++) inputs.push({code: bc, item: "accuracy", sample: `Placebo stock ${i}`, conc: "", symbol: "", symPos: ""}); let accConcs = prompt("3 個準確度濃度 (用逗號分隔)：", "80%,100%,120%"); if (accConcs === null) return; let accArr = accConcs.split(","); for(let i=0; i<3; i++) for(let j=0; j<3; j++) inputs.push({code: bc, item: "accuracy", sample: `Sa${j+1}`, conc: accArr[i] ? accArr[i].trim() : "", symbol: "", symPos: ""}); break;
+            case 'precision': for(let i=1; i<=6; i++) inputs.push({code: bc, item: "precision", sample: `Sa${i}`, conc: "", symbol: "", symPos: ""}); break;
+            case 'intermediate': for(let i=1; i<=6; i++) inputs.push({code: bc, item: "intermediate precision", sample: `Sa${i}`, conc: "", symbol: "", symPos: ""}); break;
+            case 'stability': let stabStd = prompt("【Stability】STD stock 瓶數？(若無填0)", "1"); if (stabStd === null) return; for(let i=1; i<=parseInt(stabStd||0); i++) inputs.push({code: bc, item: "solution stability", sample: `STD stock ${i}`, conc: "", symbol: "", symPos: ""}); inputs.push({code: bc, item: "solution stability", sample: "STD", conc: "", symbol: "", symPos: ""}); let stabSa = prompt("【Stability】Sa stock 瓶數？(若無填0)", "1"); if (stabSa === null) return; for(let i=1; i<=parseInt(stabSa||0); i++) inputs.push({code: bc, item: "solution stability", sample: `Sa stock ${i}`, conc: "", symbol: "", symPos: ""}); inputs.push({code: bc, item: "solution stability", sample: "Sa", conc: "", symbol: "", symPos: ""}); break;
+            case 'lod': let lodCnt = prompt("【LOD】LOD stock 瓶數？(若無填0)", "1"); if (lodCnt === null) return; for(let i=1; i<=parseInt(lodCnt||0); i++) inputs.push({code: bc, item: "LOD", sample: `LOD stock ${i}`, conc: "", symbol: "", symPos: ""}); inputs.push({code: bc, item: "LOD", sample: "LOD", conc: "", symbol: "", symPos: ""}); break;
+            case 'loq': let loqCnt = prompt("【LOQ】LOQ stock 瓶數？(若無填0)", "1"); if (loqCnt === null) return; for(let i=1; i<=parseInt(loqCnt||0); i++) inputs.push({code: bc, item: "LOQ", sample: `LOQ stock ${i}`, conc: "", symbol: "", symPos: ""}); inputs.push({code: bc, item: "LOQ", sample: "LOQ", conc: "", symbol: "", symPos: ""}); break;
         }
         globalLabels.push(...inputs); renderPreview();
     }
 
+    // 🚀 多批次防呆：圖案上中下輪替 + 群組化階層列印 + 16種向量空心圖案
     function addRoutine(itemName, defaultSaCount, askResolution = true) {
         let inputs = [];
+        let bc = getBaseCode();
+
+        // 1. 共用的 Res 和 STD
         if (askResolution) {
             if (confirm(`【${itemName}】需要配製 Resolution 嗎？\n(按確定加入，按取消跳過)`)) {
                 let resStock = prompt(`請輸入 Resolution stock 有幾瓶？(若無填 0)`, "1"); if (resStock === null) return; 
-                for(let i=1; i<=parseInt(resStock||0); i++) inputs.push({item: itemName, sample: `Resolution stock ${i}`, conc: ""});
-                inputs.push({item: itemName, sample: "Resolution", conc: ""});
+                for(let i=1; i<=parseInt(resStock||0); i++) inputs.push({code: bc, item: itemName, sample: `Resolution stock ${i}`, conc: "", symbol: "", symPos: ""});
+                inputs.push({code: bc, item: itemName, sample: "Resolution", conc: "", symbol: "", symPos: ""});
             }
         }
         let stdStock = prompt(`【${itemName}】請輸入 STD stock 有幾瓶？(若無填 0)`, "1"); if (stdStock === null) return;
-        for(let i=1; i<=parseInt(stdStock||0); i++) inputs.push({item: itemName, sample: `STD stock ${i}`, conc: ""});
-        inputs.push({item: itemName, sample: "STD", conc: ""});
+        for(let i=1; i<=parseInt(stdStock||0); i++) inputs.push({code: bc, item: itemName, sample: `STD stock ${i}`, conc: "", symbol: "", symPos: ""});
+        inputs.push({code: bc, item: itemName, sample: "STD", conc: "", symbol: "", symPos: ""});
 
-        let saStock = prompt(`【${itemName}】請輸入 Sa stock 有幾瓶？(若無填 0)`, "1"); if (saStock === null) return;
-        for(let i=1; i<=parseInt(saStock||0); i++) inputs.push({item: itemName, sample: `Sa stock ${i}`, conc: ""});
+        // 2. 詢問批次數量
+        let batchStr = prompt(`【${itemName}】請問共有幾批不同的樣品要一起檢驗？\n(輸入 1 為單批，最多支援 16 批獨立空心符號防呆)`, "1");
+        if (batchStr === null) return;
+        let batchCount = parseInt(batchStr) || 1;
 
-        let saFinalCount = prompt(`【${itemName}】請確認最終樣品 (Sa) 有幾支？`, defaultSaCount); if (saFinalCount === null) return;
-        let count = parseInt(saFinalCount||defaultSaCount);
-        for(let i=1; i<=count; i++) inputs.push({item: itemName, sample: (count === 1 && itemName === "ID") ? "Sa" : `Sa${i}`, conc: ""});
+        const positions = ["t", "m", "b"]; // t:上, m:中, b:下 (縮寫節省QR空間)
+
+        if (batchCount === 1) {
+            let saStockStepsStr = prompt(`【單批檢驗】每支樣品需要幾階 Stock？\n(若無請填 0，若需兩次稀釋請填 2)`, "1");
+            if (saStockStepsStr === null) return;
+            let saStockSteps = parseInt(saStockStepsStr) || 0;
+
+            let saFinalCount = prompt(`【單批檢驗】請確認最終樣品 (Sa) 有幾支？`, defaultSaCount); 
+            if (saFinalCount === null) return;
+            let count = parseInt(saFinalCount||defaultSaCount);
+            
+            for(let j=1; j<=saStockSteps; j++) {
+                for(let i=1; i<=count; i++) {
+                    let suffix = (count === 1 && itemName === "ID") ? "" : i;
+                    let stockName = saStockSteps === 1 ? `Sa${suffix} stock` : `Sa${suffix} stock ${j}`;
+                    inputs.push({code: bc, item: itemName, sample: stockName, conc: "", symbol: "", symPos: ""});
+                }
+            }
+            for(let i=1; i<=count; i++) {
+                let suffix = (count === 1 && itemName === "ID") ? "" : i;
+                inputs.push({code: bc, item: itemName, sample: `Sa${suffix}`, conc: "", symbol: "", symPos: ""});
+            }
+        } else {
+            let prodName = prompt(`【多批次生成】請確認「產品名稱」\n(例如：TA03)`, bc);
+            if (prodName === null) return;
+            let startBatchStr = prompt(`請輸入「起始批號」\n(例如：0001，系統會自動遞增並補零)`, "0001");
+            if (startBatchStr === null) return;
+            
+            let startNum = parseInt(startBatchStr);
+            let padLength = startBatchStr.length; 
+
+            let saStockStepsStr = prompt(`每支樣品需要幾階 Stock？\n(若無請填 0，若需兩次稀釋請填 2)`, "1");
+            if (saStockStepsStr === null) return;
+            let saStockSteps = parseInt(saStockStepsStr) || 0;
+
+            let saFinalCount = prompt(`每批最終樣品 (Sa) 需要幾支？`, defaultSaCount); 
+            if (saFinalCount === null) return;
+            let count = parseInt(saFinalCount||defaultSaCount);
+            
+            for (let b = 0; b < batchCount; b++) {
+                let currentBatchNum = (startNum + b).toString().padStart(padLength, '0');
+                
+                // 🌟 使用數字索引 (0~15) 儲存，渲染時才轉成 SVG 圖片，QR碼超小！
+                let symbolIndex = (b % 16).toString(); 
+                let currentPos = positions[b % 3]; 
+                let currentBatchCode = prodName + currentBatchNum; 
+
+                for(let j=1; j<=saStockSteps; j++) {
+                    for(let i=1; i<=count; i++) {
+                        let suffix = (count === 1 && itemName === "ID") ? "" : i;
+                        let stockName = saStockSteps === 1 ? `Sa${suffix} stock` : `Sa${suffix} stock ${j}`;
+                        inputs.push({code: currentBatchCode, item: itemName, sample: stockName, conc: "", symbol: symbolIndex, symPos: currentPos});
+                    }
+                }
+                for(let i=1; i<=count; i++) {
+                    let suffix = (count === 1 && itemName === "ID") ? "" : i;
+                    inputs.push({code: currentBatchCode, item: itemName, sample: `Sa${suffix}`, conc: "", symbol: symbolIndex, symPos: currentPos});
+                }
+            }
+        }
         
         globalLabels.push(...inputs); renderPreview();
     }
@@ -270,7 +395,8 @@
     function removeSingleLabel(index) { globalLabels.splice(index, 1); renderPreview(); }
 
     function renderPreview() {
-        const name = document.getElementById("userName").value.trim(), code = document.getElementById("code").value.trim();
+        const name = document.getElementById("userName").value.trim();
+        const baseCode = document.getElementById("code").value.trim();
         const prepDate = document.getElementById("prepDate").value.trim(), expDate = document.getElementById("expDate").value.trim();
         const width = document.getElementById("labelWidth").value, height = document.getElementById("labelHeight").value;
 
@@ -280,15 +406,17 @@
 
         const isCompact = height < 20, fontSize = isCompact ? "7.5px" : "11px", padding = isCompact ? "0.5mm" : "1mm", lineHeight = isCompact ? "1.1" : "1.3";
         let dateHtmlLarge = "", dateHtmlSmall = "";
+        
         if (prepDate || expDate) {
-            let combinedDates = [prepDate ? `配: ${prepDate}` : '', expDate ? `效: ${expDate}` : ''].filter(Boolean).join(" | ");
-            dateHtmlLarge = `<div><strong>日期:</strong> ${combinedDates}</div>`; dateHtmlSmall = `<div>${combinedDates}</div>`;
+            let combinedDates = [prepDate ? `配:${prepDate}` : '', expDate ? `效:${expDate}` : ''].filter(Boolean).join(" | ");
+            dateHtmlLarge = `<div>${combinedDates}</div>`; 
+            dateHtmlSmall = `<div>${combinedDates}</div>`;
         }
 
         if(globalLabels.length > 0) {
             const countDiv = document.createElement("div"); countDiv.className = "hide-on-print"; 
             countDiv.innerHTML = `🌟 目前共 <strong>${globalLabels.length}</strong> 張標籤準備列印`;
-            countDiv.style.cssText = "font-size: 13px; color: #e67e22; font-weight: bold; margin-bottom: 5px;"; printArea.appendChild(countDiv);
+            countDiv.style.cssText = "font-size: 13px; color: #222; font-weight: 900; margin-bottom: 5px;"; printArea.appendChild(countDiv);
         }
 
         globalLabels.forEach((label, index) => {
@@ -296,23 +424,39 @@
             labelDiv.style.width = `${width}mm`; labelDiv.style.height = `${height}mm`;
             labelDiv.style.fontSize = fontSize; labelDiv.style.padding = padding; labelDiv.style.lineHeight = lineHeight;
 
+            const currentCode = label.code || baseCode;
             let lines = [];
+
+            // 🌟 極簡排版
             if (!isCompact) {
-                if (code) lines.push(`<div><strong>代號/批號:</strong> ${code}</div>`);
-                let itemSample = [label.item ? `<strong>Item:</strong> ${label.item}` : '', label.sample ? `<strong>樣品:</strong> ${label.sample}` : ''].filter(Boolean);
-                if (itemSample.length > 0) lines.push(`<div>${itemSample.join(" | ")}</div>`);
-                if (label.conc) lines.push(`<div><strong>濃度:</strong> ${label.conc}</div>`);
-                if (name) lines.push(`<div><strong>人員:</strong> ${name}</div>`);
+                if (currentCode) lines.push(`<div><strong>${currentCode}</strong></div>`);
+                let itemSample = [label.item, label.sample].filter(Boolean);
+                if (itemSample.length > 0) lines.push(`<div>${itemSample.join(" - ")}</div>`);
+                if (label.conc) lines.push(`<div>${label.conc}</div>`);
+                if (name) lines.push(`<div>${name}</div>`);
                 if (dateHtmlLarge) lines.push(dateHtmlLarge);
             } else {
-                if (code) lines.push(`<div><strong>${code}</strong></div>`);
+                if (currentCode) lines.push(`<div><strong>${currentCode}</strong></div>`);
                 let itemSampleSmall = [label.item, label.sample].filter(Boolean);
                 if (itemSampleSmall.length > 0) lines.push(`<div>${itemSampleSmall.join(" - ")}</div>`);
                 if (label.conc) lines.push(`<div>${label.conc}</div>`);
-                if (name) lines.push(`<div>人員: ${name}</div>`);
+                if (name) lines.push(`<div>${name}</div>`);
                 if (dateHtmlSmall) lines.push(dateHtmlSmall);
             }
             labelDiv.innerHTML = lines.join("");
+
+            // 🎨 插入手繪 SVG 空心圖形
+            if (label.symbol !== "") {
+                const symDiv = document.createElement("div");
+                symDiv.innerHTML = getSvgIcon(label.symbol);
+                
+                let posCss = "bottom: 0.5mm;"; // b
+                if (label.symPos === "t") posCss = "top: 0.5mm;";
+                else if (label.symPos === "m") posCss = "top: 0; bottom: 0; margin: auto; height: 22px;"; // 垂直置中
+
+                symDiv.style.cssText = `position: absolute; ${posCss} right: 1.5mm; line-height: 1;`;
+                labelDiv.appendChild(symDiv);
+            }
 
             const delBtn = document.createElement("button"); delBtn.innerHTML = "✖"; delBtn.className = "btn-delete hide-on-print";
             delBtn.onclick = function() { removeSingleLabel(index); };
@@ -325,7 +469,6 @@
         window.print();
     }
 
-    // 🌟 解析超級壓縮碼的共用核心
     function decodeAndImportQR(qrData) {
         try {
             const decodedString = decodeURIComponent(qrData);
@@ -334,12 +477,18 @@
             if (decodedString.startsWith("[")) {
                 imported = JSON.parse(decodedString);
                 if(imported.length > 0 && Array.isArray(imported[0])) {
-                    imported = imported.map(arr => ({ item: arr[0], sample: arr[1], conc: arr[2] }));
+                    imported = imported.map(arr => ({ code: arr[0], item: arr[1], sample: arr[2], conc: arr[3], symbol: arr[4]||"", symPos: arr[5]||"" }));
                 }
             } else {
                 imported = decodedString.split("~").map(row => {
                     const parts = row.split("|");
-                    return { item: parts[0]||"", sample: parts[1]||"", conc: parts[2]||"" };
+                    if (parts.length >= 6) {
+                        return { code: parts[0]||"", item: parts[1]||"", sample: parts[2]||"", conc: parts[3]||"", symbol: parts[4]||"", symPos: parts[5]||"" };
+                    } else if (parts.length >= 4) {
+                        return { code: parts[0]||"", item: parts[1]||"", sample: parts[2]||"", conc: parts[3]||"", symbol: parts[4]||"", symPos: "" };
+                    } else {
+                        return { code: document.getElementById("code").value, item: parts[0]||"", sample: parts[1]||"", conc: parts[2]||"", symbol: "", symPos: "" };
+                    }
                 });
             }
             
@@ -347,21 +496,15 @@
                 globalLabels = globalLabels.concat(imported);
                 renderPreview();
                 alert(`✅ 成功掃描，已匯入 ${imported.length} 張標籤！`);
-                return true; // 成功
+                return true; 
             }
-        } catch(err) { 
-            console.error(err);
-        }
-        return false; // 失敗
+        } catch(err) { console.error(err); }
+        return false; 
     }
-
-    /* =========================================
-       下面是 QR / JSON / 相機的檔案傳輸功能區
-    ========================================= */
 
     function generateQR() {
         if(globalLabels.length === 0) return alert("⚠️ 沒有標籤可產生 QR Code！");
-        const compressedData = globalLabels.map(l => `${l.item||""}|${l.sample||""}|${l.conc||""}`).join("~");
+        const compressedData = globalLabels.map(l => `${l.code||""}|${l.item||""}|${l.sample||""}|${l.conc||""}|${l.symbol||""}|${l.symPos||""}`).join("~");
         const safeData = encodeURIComponent(compressedData);
         if(safeData.length > 2000) return alert("⚠️ 標籤過多，請改用「導出 JSON 檔」。");
         document.getElementById("qrModal").style.display = "flex";
@@ -408,24 +551,22 @@
         reader.readAsDataURL(file); event.target.value = '';
     }
 
-    // 📹 實時鏡頭掃描核心邏輯
     function startScanner() {
         const video = document.getElementById("videoElement");
         const modal = document.getElementById("scannerModal");
         
-        // 要求相機權限，優先使用後置鏡頭(或外接 WebCam)
         navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
             .then(function(stream) {
                 scanningActive = true;
                 videoStream = stream;
                 video.srcObject = stream;
-                video.setAttribute("playsinline", true); // iOS Safari 必需
+                video.setAttribute("playsinline", true); 
                 video.play();
                 modal.style.display = "flex";
                 requestAnimationFrame(tick);
             })
             .catch(function(err) {
-                alert("❌ 無法開啟相機，請確認電腦有連接視訊鏡頭，並允許瀏覽器存取相機權限！");
+                alert("❌ 無法開啟相機，請確認電腦有連接視訊鏡頭！");
                 console.error(err);
             });
     }
@@ -443,7 +584,6 @@
         const video = document.getElementById("videoElement");
         
         if (video.readyState === video.HAVE_ENOUGH_DATA) {
-            // 在背景建立一塊畫布來擷取當下鏡頭畫面
             const canvas = document.createElement("canvas");
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
@@ -451,18 +591,15 @@
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             
-            // 丟給 jsQR 解析，不要倒置減少運算量以提升流暢度
             const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
             
             if (code) {
-                // 掃描成功！嘗試解析資料
                 if(decodeAndImportQR(code.data)) {
-                    stopScanner(); // 解析成功就關閉鏡頭
+                    stopScanner(); 
                     return; 
                 }
             }
         }
-        // 如果沒掃到，就一直循環抓取下一幀畫面
         requestAnimationFrame(tick);
     }
 </script>
