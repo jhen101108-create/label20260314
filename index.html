@@ -5,18 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>實驗室標籤旗艦系統</title>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <style id="dynamicPageSize"></style>
 
     <style>
-        /* --- 📱 極致手機 App 窄版風格 --- */
         body { font-family: 'Segoe UI', Tahoma, '微軟正黑體', sans-serif; background-color: #e9ecef; padding: 15px 10px; margin: 0; color: #333; display: flex; justify-content: center; }
         .ui-container { width: 100%; max-width: 420px; background: #ffffff; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         h2 { text-align: center; font-size: 20px; font-weight: bold; margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; color: #2c3e50; }
         
         .form-group { margin-bottom: 10px; }
         label { display: block; font-weight: bold; margin-bottom: 4px; font-size: 13px; color: #34495e; }
-        .hint { font-weight: normal; color: #e74c3c; font-size: 11px; }
         
         input, select { width: 100%; padding: 8px 10px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; font-size: 14px; background-color: #f8f9fa; font-family: inherit;}
         input:focus, select:focus { outline: none; border-color: #3498db; background-color: #fff; box-shadow: 0 0 0 2px rgba(52,152,219,0.2); }
@@ -27,14 +26,12 @@
         .btn-today { background-color: #e74c3c; }
         .btn-size { background-color: #9b59b6; }
         
-        /* --- 🌟 三分頁 (Tabs) 樣式 --- */
         .tabs { display: flex; margin-top: 15px; border-bottom: 2px solid #3498db; }
         .tab-btn { flex: 1; text-align: center; padding: 8px 4px; cursor: pointer; background: #ecf0f1; font-weight: bold; font-size: 13px; color: #7f8c8d; border-radius: 8px 8px 0 0; transition: 0.3s; margin: 0 1px; }
         .tab-btn.active { background: #3498db; color: #fff; }
         .tab-content { display: none; padding: 15px 0 0 0; }
         .tab-content.active { display: block; }
 
-        /* --- 🌟 SOP 按鈕網格 --- */
         .sop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .btn-sop { padding: 10px 4px; font-size: 13px; font-weight: bold; color: white; border: none; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .btn-sop:active { transform: scale(0.97); box-shadow: none; }
@@ -42,26 +39,31 @@
         .bg-acc { background: #c0392b; } .bg-prec { background: #27ae60; } .bg-stab { background: #d35400; } .bg-lim { background: #7f8c8d; }
         .bg-rt1 { background: #16a085; } .bg-rt2 { background: #2980b9; } .bg-rt3 { background: #8e44ad; } .bg-rt4 { background: #f39c12; }
 
-        /* 底部主要按鈕 (拆成電腦與手機專用) */
-        .action-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; border-top: 2px dashed #eee; padding-top: 15px;}
-        .btn-action { flex: 1 1 45%; padding: 12px 4px; color: #fff; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; }
+        .transfer-box { background: #e8f4f8; border: 2px dashed #3498db; padding: 10px; border-radius: 8px; margin-top: 15px; }
+        .transfer-title { text-align: center; font-size: 13px; font-weight: bold; color: #2980b9; margin-bottom: 8px; }
+        .action-group { display: flex; flex-wrap: wrap; gap: 6px; }
+        /* 調整傳輸按鈕大小適應三個選項 */
+        .btn-action { flex: 1 1 30%; padding: 10px 4px; color: #fff; border: none; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
         .btn-action:active { transform: scale(0.97); }
-        .btn-print { background-color: #2ecc71; } 
-        .btn-pdf { background-color: #e67e22; }
-        .btn-clear { background-color: #e74c3c; flex: 1 1 100%; margin-bottom: 5px; }
+        .btn-qr { background-color: #8e44ad; }
+        .btn-json { background-color: #f39c12; }
+        
+        .main-actions { display: flex; gap: 8px; margin-top: 10px; }
+        .btn-print { background-color: #2ecc71; flex: 2; padding: 12px; font-size: 15px; border-radius: 6px; color: white; border: none; font-weight: bold; cursor: pointer;} 
+        .btn-clear { background-color: #e74c3c; flex: 1; border-radius: 6px; color: white; border: none; font-weight: bold; cursor: pointer;}
 
-        /* 標籤預覽區 */
         #printArea { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 15px; }
         .label-box { background: white; border: 1px dashed #e74c3c; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; color: black; }
+        .btn-delete { position: absolute; top: 2px; right: 2px; background: #e74c3c; color: white; border: none; border-radius: 4px; width: 20px; height: 20px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
 
-        /* 🌟 單張刪除按鈕 (列印時隱藏) */
-        .btn-delete {
-            position: absolute; top: 2px; right: 2px; background: #e74c3c; color: white; border: none; border-radius: 4px;
-            width: 20px; height: 20px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10;
-        }
-        .btn-delete:hover { background: #c0392b; }
+        /* 🌟 彈窗通用樣式 */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 0 20px rgba(255,255,255,0.2); text-align: center; }
+        .btn-close-modal { padding: 10px 30px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; background: #e74c3c; color: white; cursor: pointer; }
+        
+        /* 鏡頭掃描專用 */
+        #videoElement { width: 100%; max-width: 350px; border-radius: 8px; transform: scaleX(-1); } /* 鏡像翻轉，方便對準 */
 
-        /* 🖨️ 列印專屬設定 */
         @media print {
             body { background: white; margin: 0; padding: 0; }
             .hide-on-print { display: none !important; }
@@ -83,22 +85,16 @@
                 <div class="form-group"><label>🏷️ 批號</label><input type="text" id="code" value="TA03"></div>
             </div>
             <div class="row">
-                <div class="form-group">
-                    <label>📅 配製</label>
-                    <div style="display: flex; gap: 4px;"><input type="text" id="prepDate"><button class="btn-small btn-today" onclick="setToday()">今</button></div>
-                </div>
+                <div class="form-group"><label>📅 配製</label><div style="display: flex; gap: 4px;"><input type="text" id="prepDate"><button class="btn-small btn-today" onclick="setToday()">今</button></div></div>
                 <div class="form-group"><label>⏳ 有效</label><input type="text" id="expDate"></div>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
                 <label style="margin: 0;">📏 尺寸(mm):</label>
-                <div style="display: flex; gap: 4px;">
-                    <button class="btn-small btn-size" onclick="setLabelSize(40, 20)">大(40x20)</button>
-                    <button class="btn-small btn-size" onclick="setLabelSize(25, 15)">小(25x15)</button>
-                </div>
+                <div style="display: flex; gap: 4px;"><button class="btn-small btn-size" onclick="setLabelSize(40, 20)">大(40x20)</button><button class="btn-small btn-size" onclick="setLabelSize(25, 15)">小(25x15)</button></div>
             </div>
             <div class="row" style="margin-top: 5px;">
-                <input type="number" id="labelWidth" value="40" title="寬度" style="text-align: center;"> x 
-                <input type="number" id="labelHeight" value="20" title="高度" style="text-align: center;">
+                <input type="number" id="labelWidth" value="40" style="text-align: center;"> x 
+                <input type="number" id="labelHeight" value="20" style="text-align: center;">
             </div>
         </div>
 
@@ -110,40 +106,24 @@
 
         <div id="tab1" class="tab-content active">
             <div class="form-group combo-box">
-                <label>🔬 檢驗項目 (Item)</label>
-                <select id="itemSelect" onchange="fillInput('item', this.value)">
-                    <option value="">▼ 快速帶入 ▼</option>
-                    <option value="System">System</option><option value="linearity">linearity</option>
-                    <option value="accuracy">accuracy</option><option value="precision">precision</option>
-                    <option value="intermediate precision">intermediate precision</option>
-                    <option value="solution stability">solution stability</option>
-                    <option value="specificity">specificity</option>
-                    <option value="LOD">LOD</option><option value="LOQ">LOQ</option>
-                    <option value="assay">assay</option><option value="CU">CU</option>
-                    <option value="Diss">Diss</option><option value="Imp">Imp</option>
-                    <option value="ID">ID</option>
-                </select>
-                <input type="text" id="item" placeholder="或手動輸入">
+                <label>🔬 檢驗項目</label>
+                <select id="itemSelect" onchange="fillInput('item', this.value)"><option value="">▼ 快速帶入 ▼</option><option value="System">System</option><option value="linearity">linearity</option><option value="accuracy">accuracy</option><option value="precision">precision</option><option value="intermediate precision">intermediate precision</option><option value="solution stability">solution stability</option><option value="specificity">specificity</option><option value="LOD">LOD</option><option value="LOQ">LOQ</option><option value="assay">assay</option><option value="CU">CU</option><option value="Diss">Diss</option><option value="Imp">Imp</option><option value="ID">ID</option></select>
+                <input type="text" id="item">
             </div>
             <div class="form-group combo-box">
                 <label>🧪 樣品字首</label>
-                <select id="sampleSelect" onchange="fillInput('sampleType', this.value)">
-                    <option value="">▼ 快速帶入 ▼</option>
-                    <option value="Sa">Sa</option><option value="STD">STD</option><option value="BK">BK</option>
-                </select>
+                <select id="sampleSelect" onchange="fillInput('sampleType', this.value)"><option value="">▼ 快速帶入 ▼</option><option value="Sa">Sa</option><option value="STD">STD</option><option value="BK">BK</option></select>
                 <input type="text" id="sampleType" value="Sa">
             </div>
             <div class="row">
-                <div class="form-group"><label>🔢 起始號</label><input type="text" id="startNum" placeholder="空=無數字"></div>
+                <div class="form-group"><label>🔢 起始號</label><input type="text" id="startNum"></div>
                 <div class="form-group"><label>🖨️ 印幾張</label><input type="number" id="printCount" value="1" min="1"></div>
             </div>
-            <div class="form-group"><label>💧 濃度</label><input type="text" id="conc" placeholder="例如：10 ppm"></div>
-            
+            <div class="form-group"><label>💧 濃度</label><input type="text" id="conc"></div>
             <button class="btn-action" style="width: 100%; margin-top: 10px; background-color: #3498db;" onclick="addCustomLabel()">➕ 加入預覽列</button>
         </div>
 
         <div id="tab2" class="tab-content">
-            <label style="color: #e67e22; font-size: 12px; margin-bottom: 8px;">💡 點擊按鈕，依照提示輸入數量即可疊加標籤</label>
             <div class="sop-grid">
                 <button class="btn-sop bg-sys" onclick="addSOP('system')">1. System</button>
                 <button class="btn-sop bg-spec" onclick="addSOP('specificity')">2. Specificity</button>
@@ -158,7 +138,6 @@
         </div>
 
         <div id="tab3" class="tab-content">
-            <label style="color: #16a085; font-size: 12px; margin-bottom: 8px;">💡 點擊按鈕，自動配對 Resolution, STD, Sa 標籤</label>
             <div class="sop-grid">
                 <button class="btn-sop bg-rt1" onclick="addRoutine('Assay', 2)">1. Assay</button>
                 <button class="btn-sop bg-rt1" onclick="addRoutine('CU', 10)">2. CU</button>
@@ -172,359 +151,319 @@
             </div>
         </div>
 
-        <div class="action-group">
-            <button class="btn-action btn-clear" onclick="clearPreview()">🗑️ 全部清空</button>
-            <button class="btn-action btn-print" onclick="printLabels()">🖨️ 電腦直接列印</button>
-            <button class="btn-action btn-pdf" id="btnPdfMobile" onclick="downloadPDFMobile()">📄 手機存 PDF</button>
+        <input type="file" id="jsonInput" accept=".json" style="display:none" onchange="importJSON(event)">
+        <input type="file" id="qrImageInput" accept="image/*" style="display:none" onchange="readQRImage(event)">
+
+        <div class="transfer-box">
+            <div class="transfer-title">📡 資料傳送門 (手機 ⇆ 電腦)</div>
+            <div class="action-group" style="margin-bottom: 5px;">
+                <button class="btn-action btn-qr" style="flex: 1 1 100%; font-size: 14px; background:#9b59b6;" onclick="generateQR()">📲 1.手機：產生分享 QR 碼</button>
+            </div>
+            <div class="action-group">
+                <button class="btn-action btn-qr" onclick="startScanner()">📹 2.電腦：開啟鏡頭掃描</button>
+                <button class="btn-action btn-qr" style="background:#8e44ad;" onclick="document.getElementById('qrImageInput').click()">🖼️ 2.電腦：讀圖片備案</button>
+                <button class="btn-action btn-json" onclick="exportJSON()">💾 導 JSON</button>
+                <button class="btn-action btn-json" onclick="document.getElementById('jsonInput').click()">📂 讀 JSON</button>
+            </div>
         </div>
-        <div style="text-align: center; font-size: 12px; color: #7f8c8d; margin-top: 8px;">
-            💡 手機請按「存 PDF」，電腦請按「直接列印」
+
+        <div class="main-actions">
+            <button class="btn-clear" onclick="clearPreview()">🗑️ 全部清空</button>
+            <button class="btn-print" onclick="printLabels()">🖨️ 電腦直接列印</button>
         </div>
-    </div> <div id="printArea"></div>
+        
+    </div> 
+    <div id="printArea"></div>
+</div>
+
+<div id="qrModal" class="modal">
+    <div style="color: white; margin-bottom: 10px; font-weight: bold; text-align: center;">請將此條碼對準電腦視訊鏡頭<br>(或截圖傳送)</div>
+    <div class="modal-content"><canvas id="qrCanvas"></canvas></div>
+    <button class="btn-close-modal" onclick="closeQR()">關閉</button>
+</div>
+
+<div id="scannerModal" class="modal">
+    <div style="color: white; margin-bottom: 10px; font-weight: bold; text-align: center; font-size: 18px;">正在尋找 QR Code...</div>
+    <div class="modal-content" style="padding: 5px; background: #333;">
+        <video id="videoElement" autoplay playsinline></video>
+    </div>
+    <div style="color: #f1c40f; margin-bottom: 15px; font-size: 12px;">請將手機畫面上的條碼對準鏡頭</div>
+    <button class="btn-close-modal" onclick="stopScanner()">取消掃描</button>
 </div>
 
 <script>
     let globalLabels = [];
+    let videoStream = null;
+    let scanningActive = false;
 
     window.onload = function() {
         const savedName = localStorage.getItem("labUserName");
         if (savedName) document.getElementById("userName").value = savedName;
     };
 
-    function switchTab(tabIndex) {
-        document.querySelectorAll('.tab-btn').forEach((btn, i) => {
-            btn.classList.toggle('active', i + 1 === tabIndex);
-        });
-        document.querySelectorAll('.tab-content').forEach((content, i) => {
-            content.classList.toggle('active', i + 1 === tabIndex);
-        });
+    function switchTab(t) {
+        document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i + 1 === t));
+        document.querySelectorAll('.tab-content').forEach((c, i) => c.classList.toggle('active', i + 1 === t));
     }
 
     function setToday() {
-        const today = new Date();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        document.getElementById("prepDate").value = `${month}/${day}`;
+        const d = new Date();
+        document.getElementById("prepDate").value = `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
     }
 
-    function setLabelSize(width, height) {
-        document.getElementById("labelWidth").value = width;
-        document.getElementById("labelHeight").value = height;
+    function setLabelSize(w, h) {
+        document.getElementById("labelWidth").value = w;
+        document.getElementById("labelHeight").value = h;
         renderPreview(); 
     }
 
-    function fillInput(inputId, value) {
-        if (value) document.getElementById(inputId).value = value;
-        document.getElementById(inputId + "Select").selectedIndex = 0;
-    }
+    function fillInput(i, v) { if (v) document.getElementById(i).value = v; document.getElementById(i + "Select").selectedIndex = 0; }
 
-    // ➕ 分頁 1: 自訂單張
     function addCustomLabel() {
-        const item = document.getElementById("item").value.trim();
-        const conc = document.getElementById("conc").value.trim();
-        const sampleType = document.getElementById("sampleType").value.trim();
-        const startNumStr = document.getElementById("startNum").value.trim();
+        const item = document.getElementById("item").value.trim(), conc = document.getElementById("conc").value.trim();
+        const sampleType = document.getElementById("sampleType").value.trim(), startNumStr = document.getElementById("startNum").value.trim();
         const count = parseInt(document.getElementById("printCount").value) || 1;
-
-        for (let i = 0; i < count; i++) {
-            let numSuffix = startNumStr !== "" ? parseInt(startNumStr) + i : "";
-            let currentSample = sampleType ? `${sampleType}${numSuffix}` : "";
-            globalLabels.push({ item: item, sample: currentSample, conc: conc });
-        }
+        for (let i = 0; i < count; i++) globalLabels.push({ item: item, sample: sampleType ? `${sampleType}${startNumStr !== "" ? parseInt(startNumStr) + i : ""}` : "", conc: conc });
         renderPreview();
     }
 
-    // 🚀 分頁 2: 確效 SOP
     function addSOP(type) {
         let inputs = []; 
         switch(type) {
-            case 'system':
-                let sysStock = prompt("【System】請輸入有幾瓶 STD stock？(若無填0)", "1");
-                if (sysStock === null) return;
-                for(let i=1; i<=parseInt(sysStock||0); i++) inputs.push({item: "System", sample: `STD stock ${i}`, conc: ""});
-                inputs.push({item: "System", sample: "STD", conc: ""});
-                break;
-            case 'specificity':
-                inputs.push({item: "specificity", sample: "Blank", conc: ""});
-                let pStock = prompt("【Specificity】請輸入 Placebo stock 瓶數？(若無填0)", "1");
-                if (pStock === null) return;
-                for(let i=1; i<=parseInt(pStock||0); i++) inputs.push({item: "specificity", sample: `Placebo stock ${i}`, conc: ""});
-                inputs.push({item: "specificity", sample: "Placebo", conc: ""});
-                let sStock = prompt("【Specificity】請輸入 Sa stock 瓶數？(若無填0)", "1");
-                if (sStock === null) return;
-                for(let i=1; i<=parseInt(sStock||0); i++) inputs.push({item: "specificity", sample: `Sa stock ${i}`, conc: ""});
-                inputs.push({item: "specificity", sample: "Sa", conc: ""});
-                break;
-            case 'linearity':
-                let linStock = prompt("【Linearity】請輸入 API stock 瓶數？(若無填0)", "1");
-                if (linStock === null) return;
-                for(let i=1; i<=parseInt(linStock||0); i++) inputs.push({item: "linearity", sample: `stock ${i}`, conc: ""});
-                let linConcs = prompt("請輸入 5 個線性濃度 (用逗號分隔)：", "50,75,100,125,150");
-                if (linConcs === null) return;
-                let linArr = linConcs.split(",");
-                for(let i=0; i<5; i++) inputs.push({item: "linearity", sample: `Level ${i+1}`, conc: linArr[i] ? linArr[i].trim() : ""});
-                break;
-            case 'accuracy':
-                let accApi = prompt("【Accuracy】請輸入 API stock 瓶數？(若無填0)", "1");
-                if (accApi === null) return;
-                for(let i=1; i<=parseInt(accApi||0); i++) inputs.push({item: "accuracy", sample: `API stock ${i}`, conc: ""});
-                let accPla = prompt("【Accuracy】請輸入 Placebo stock 瓶數？(若無填0)", "1");
-                if (accPla === null) return;
-                for(let i=1; i<=parseInt(accPla||0); i++) inputs.push({item: "accuracy", sample: `Placebo stock ${i}`, conc: ""});
-                let accConcs = prompt("請輸入 3 個準確度濃度 (用逗號分隔)：", "80%,100%,120%");
-                if (accConcs === null) return;
-                let accArr = accConcs.split(",");
-                for(let i=0; i<3; i++) {
-                    for(let j=0; j<3; j++) {
-                        inputs.push({item: "accuracy", sample: `Sa${j+1}`, conc: accArr[i] ? accArr[i].trim() : ""});
-                    }
-                }
-                break;
-            case 'precision':
-                for(let i=1; i<=6; i++) inputs.push({item: "precision", sample: `Sa${i}`, conc: ""});
-                break;
-            case 'intermediate':
-                for(let i=1; i<=6; i++) inputs.push({item: "intermediate precision", sample: `Sa${i}`, conc: ""});
-                break;
-            case 'stability':
-                let stabStd = prompt("【Stability】請輸入 STD stock 瓶數？(若無填0)", "1");
-                if (stabStd === null) return;
-                for(let i=1; i<=parseInt(stabStd||0); i++) inputs.push({item: "solution stability", sample: `STD stock ${i}`, conc: ""});
-                inputs.push({item: "solution stability", sample: "STD", conc: ""});
-                let stabSa = prompt("【Stability】請輸入 Sa stock 瓶數？(若無填0)", "1");
-                if (stabSa === null) return;
-                for(let i=1; i<=parseInt(stabSa||0); i++) inputs.push({item: "solution stability", sample: `Sa stock ${i}`, conc: ""});
-                inputs.push({item: "solution stability", sample: "Sa", conc: ""});
-                break;
-            case 'lod':
-                let lodCnt = prompt("【LOD】請輸入 LOD stock 瓶數？(若無填0)", "1");
-                if (lodCnt === null) return;
-                for(let i=1; i<=parseInt(lodCnt||0); i++) inputs.push({item: "LOD", sample: `LOD stock ${i}`, conc: ""});
-                inputs.push({item: "LOD", sample: "LOD", conc: ""});
-                break;
-            case 'loq':
-                let loqCnt = prompt("【LOQ】請輸入 LOQ stock 瓶數？(若無填0)", "1");
-                if (loqCnt === null) return;
-                for(let i=1; i<=parseInt(loqCnt||0); i++) inputs.push({item: "LOQ", sample: `LOQ stock ${i}`, conc: ""});
-                inputs.push({item: "LOQ", sample: "LOQ", conc: ""});
-                break;
+            case 'system': let sysStock = prompt("【System】有幾瓶 STD stock？(若無填0)", "1"); if (sysStock === null) return; for(let i=1; i<=parseInt(sysStock||0); i++) inputs.push({item: "System", sample: `STD stock ${i}`, conc: ""}); inputs.push({item: "System", sample: "STD", conc: ""}); break;
+            case 'specificity': inputs.push({item: "specificity", sample: "Blank", conc: ""}); let pStock = prompt("【Specificity】Placebo stock 瓶數？(若無填0)", "1"); if (pStock === null) return; for(let i=1; i<=parseInt(pStock||0); i++) inputs.push({item: "specificity", sample: `Placebo stock ${i}`, conc: ""}); inputs.push({item: "specificity", sample: "Placebo", conc: ""}); let sStock = prompt("【Specificity】Sa stock 瓶數？(若無填0)", "1"); if (sStock === null) return; for(let i=1; i<=parseInt(sStock||0); i++) inputs.push({item: "specificity", sample: `Sa stock ${i}`, conc: ""}); inputs.push({item: "specificity", sample: "Sa", conc: ""}); break;
+            case 'linearity': let linStock = prompt("【Linearity】API stock 瓶數？(若無填0)", "1"); if (linStock === null) return; for(let i=1; i<=parseInt(linStock||0); i++) inputs.push({item: "linearity", sample: `stock ${i}`, conc: ""}); let linConcs = prompt("請輸入 5 個線性濃度 (用逗號分隔)：", "50,75,100,125,150"); if (linConcs === null) return; let linArr = linConcs.split(","); for(let i=0; i<5; i++) inputs.push({item: "linearity", sample: `Level ${i+1}`, conc: linArr[i] ? linArr[i].trim() : ""}); break;
+            case 'accuracy': let accApi = prompt("【Accuracy】API stock 瓶數？(若無填0)", "1"); if (accApi === null) return; for(let i=1; i<=parseInt(accApi||0); i++) inputs.push({item: "accuracy", sample: `API stock ${i}`, conc: ""}); let accPla = prompt("【Accuracy】Placebo stock 瓶數？(若無填0)", "1"); if (accPla === null) return; for(let i=1; i<=parseInt(accPla||0); i++) inputs.push({item: "accuracy", sample: `Placebo stock ${i}`, conc: ""}); let accConcs = prompt("3 個準確度濃度 (用逗號分隔)：", "80%,100%,120%"); if (accConcs === null) return; let accArr = accConcs.split(","); for(let i=0; i<3; i++) for(let j=0; j<3; j++) inputs.push({item: "accuracy", sample: `Sa${j+1}`, conc: accArr[i] ? accArr[i].trim() : ""}); break;
+            case 'precision': for(let i=1; i<=6; i++) inputs.push({item: "precision", sample: `Sa${i}`, conc: ""}); break;
+            case 'intermediate': for(let i=1; i<=6; i++) inputs.push({item: "intermediate precision", sample: `Sa${i}`, conc: ""}); break;
+            case 'stability': let stabStd = prompt("【Stability】STD stock 瓶數？(若無填0)", "1"); if (stabStd === null) return; for(let i=1; i<=parseInt(stabStd||0); i++) inputs.push({item: "solution stability", sample: `STD stock ${i}`, conc: ""}); inputs.push({item: "solution stability", sample: "STD", conc: ""}); let stabSa = prompt("【Stability】Sa stock 瓶數？(若無填0)", "1"); if (stabSa === null) return; for(let i=1; i<=parseInt(stabSa||0); i++) inputs.push({item: "solution stability", sample: `Sa stock ${i}`, conc: ""}); inputs.push({item: "solution stability", sample: "Sa", conc: ""}); break;
+            case 'lod': let lodCnt = prompt("【LOD】LOD stock 瓶數？(若無填0)", "1"); if (lodCnt === null) return; for(let i=1; i<=parseInt(lodCnt||0); i++) inputs.push({item: "LOD", sample: `LOD stock ${i}`, conc: ""}); inputs.push({item: "LOD", sample: "LOD", conc: ""}); break;
+            case 'loq': let loqCnt = prompt("【LOQ】LOQ stock 瓶數？(若無填0)", "1"); if (loqCnt === null) return; for(let i=1; i<=parseInt(loqCnt||0); i++) inputs.push({item: "LOQ", sample: `LOQ stock ${i}`, conc: ""}); inputs.push({item: "LOQ", sample: "LOQ", conc: ""}); break;
         }
-        globalLabels.push(...inputs);
-        renderPreview();
+        globalLabels.push(...inputs); renderPreview();
     }
 
-    // 🧪 分頁 3: 日常檢驗
     function addRoutine(itemName, defaultSaCount, askResolution = true) {
         let inputs = [];
         if (askResolution) {
-            if (confirm(`【${itemName}】本次檢驗需要配製 Resolution 嗎？\n(按確定加入，按取消跳過)`)) {
-                let resStock = prompt(`請輸入 Resolution stock 有幾瓶？\n(若無請填 0)`, "1");
-                if (resStock === null) return; 
+            if (confirm(`【${itemName}】需要配製 Resolution 嗎？\n(按確定加入，按取消跳過)`)) {
+                let resStock = prompt(`請輸入 Resolution stock 有幾瓶？(若無填 0)`, "1"); if (resStock === null) return; 
                 for(let i=1; i<=parseInt(resStock||0); i++) inputs.push({item: itemName, sample: `Resolution stock ${i}`, conc: ""});
                 inputs.push({item: itemName, sample: "Resolution", conc: ""});
             }
         }
-        let stdStock = prompt(`【${itemName}】請輸入 STD stock 有幾瓶？\n(若無請填 0)`, "1");
-        if (stdStock === null) return;
+        let stdStock = prompt(`【${itemName}】請輸入 STD stock 有幾瓶？(若無填 0)`, "1"); if (stdStock === null) return;
         for(let i=1; i<=parseInt(stdStock||0); i++) inputs.push({item: itemName, sample: `STD stock ${i}`, conc: ""});
         inputs.push({item: itemName, sample: "STD", conc: ""});
 
-        let saStock = prompt(`【${itemName}】請輸入 Sa stock 有幾瓶？\n(若無請填 0)`, "1");
-        if (saStock === null) return;
+        let saStock = prompt(`【${itemName}】請輸入 Sa stock 有幾瓶？(若無填 0)`, "1"); if (saStock === null) return;
         for(let i=1; i<=parseInt(saStock||0); i++) inputs.push({item: itemName, sample: `Sa stock ${i}`, conc: ""});
 
-        let saFinalCount = prompt(`【${itemName}】請確認最終樣品 (Sa) 有幾支？\n(若需修改請直接更改數字)`, defaultSaCount);
-        if (saFinalCount === null) return;
+        let saFinalCount = prompt(`【${itemName}】請確認最終樣品 (Sa) 有幾支？`, defaultSaCount); if (saFinalCount === null) return;
         let count = parseInt(saFinalCount||defaultSaCount);
+        for(let i=1; i<=count; i++) inputs.push({item: itemName, sample: (count === 1 && itemName === "ID") ? "Sa" : `Sa${i}`, conc: ""});
         
-        for(let i=1; i<=count; i++) {
-            let sampleStr = (count === 1 && itemName === "ID") ? "Sa" : `Sa${i}`;
-            inputs.push({item: itemName, sample: sampleStr, conc: ""});
-        }
-        globalLabels.push(...inputs);
-        renderPreview();
+        globalLabels.push(...inputs); renderPreview();
     }
 
-    function clearPreview() {
-        if(confirm("確定要清空所有已經加入的標籤嗎？")) {
-            globalLabels = [];
-            renderPreview();
-        }
-    }
+    function clearPreview() { if(confirm("確定要清空嗎？")) { globalLabels = []; renderPreview(); } }
+    function removeSingleLabel(index) { globalLabels.splice(index, 1); renderPreview(); }
 
-    function removeSingleLabel(index) {
-        globalLabels.splice(index, 1);
-        renderPreview(); 
-    }
-
-    // 🎨 渲染預覽畫面
     function renderPreview() {
-        const name = document.getElementById("userName").value.trim();
-        const code = document.getElementById("code").value.trim();
-        const prepDate = document.getElementById("prepDate").value.trim();
-        const expDate = document.getElementById("expDate").value.trim();
-        const width = document.getElementById("labelWidth").value;
-        const height = document.getElementById("labelHeight").value;
+        const name = document.getElementById("userName").value.trim(), code = document.getElementById("code").value.trim();
+        const prepDate = document.getElementById("prepDate").value.trim(), expDate = document.getElementById("expDate").value.trim();
+        const width = document.getElementById("labelWidth").value, height = document.getElementById("labelHeight").value;
 
         if (name) localStorage.setItem("labUserName", name);
+        document.getElementById("dynamicPageSize").innerHTML = `@media print { @page { size: ${width}mm ${height}mm; margin: 0; } body { margin: 0; } }`;
+        const printArea = document.getElementById("printArea"); printArea.innerHTML = ""; 
 
-        const styleTag = document.getElementById("dynamicPageSize");
-        styleTag.innerHTML = `@media print { @page { size: ${width}mm ${height}mm; margin: 0; } body { margin: 0; } }`;
-
-        const printArea = document.getElementById("printArea");
-        printArea.innerHTML = ""; 
-
-        const isCompact = height < 20;
-        const fontSize = isCompact ? "7.5px" : "11px";
-        const padding = isCompact ? "0.5mm" : "1mm"; 
-        const lineHeight = isCompact ? "1.1" : "1.3";
-
-        let dateHtmlLarge = "";
-        let dateHtmlSmall = "";
+        const isCompact = height < 20, fontSize = isCompact ? "7.5px" : "11px", padding = isCompact ? "0.5mm" : "1mm", lineHeight = isCompact ? "1.1" : "1.3";
+        let dateHtmlLarge = "", dateHtmlSmall = "";
         if (prepDate || expDate) {
-            let datesObj = [];
-            if (prepDate) datesObj.push(`配: ${prepDate}`);
-            if (expDate) datesObj.push(`效: ${expDate}`);
-            let combinedDates = datesObj.join(" | ");
-            dateHtmlLarge = `<div><strong>日期:</strong> ${combinedDates}</div>`;
-            dateHtmlSmall = `<div>${combinedDates}</div>`;
+            let combinedDates = [prepDate ? `配: ${prepDate}` : '', expDate ? `效: ${expDate}` : ''].filter(Boolean).join(" | ");
+            dateHtmlLarge = `<div><strong>日期:</strong> ${combinedDates}</div>`; dateHtmlSmall = `<div>${combinedDates}</div>`;
         }
 
         if(globalLabels.length > 0) {
-            const countDiv = document.createElement("div");
-            countDiv.className = "hide-on-print"; 
+            const countDiv = document.createElement("div"); countDiv.className = "hide-on-print"; 
             countDiv.innerHTML = `🌟 目前共 <strong>${globalLabels.length}</strong> 張標籤準備列印`;
-            countDiv.style.cssText = "font-size: 13px; color: #e67e22; font-weight: bold; margin-bottom: 5px;";
-            printArea.appendChild(countDiv);
+            countDiv.style.cssText = "font-size: 13px; color: #e67e22; font-weight: bold; margin-bottom: 5px;"; printArea.appendChild(countDiv);
         }
 
         globalLabels.forEach((label, index) => {
-            const labelDiv = document.createElement("div");
-            labelDiv.className = "label-box";
-            labelDiv.style.width = `${width}mm`;
-            labelDiv.style.height = `${height}mm`;
-            labelDiv.style.fontSize = fontSize;
-            labelDiv.style.padding = padding;
-            labelDiv.style.lineHeight = lineHeight;
+            const labelDiv = document.createElement("div"); labelDiv.className = "label-box";
+            labelDiv.style.width = `${width}mm`; labelDiv.style.height = `${height}mm`;
+            labelDiv.style.fontSize = fontSize; labelDiv.style.padding = padding; labelDiv.style.lineHeight = lineHeight;
 
+            let lines = [];
             if (!isCompact) {
-                let lines = []; 
                 if (code) lines.push(`<div><strong>代號/批號:</strong> ${code}</div>`);
-                
-                let itemSample = [];
-                if (label.item) itemSample.push(`<strong>Item:</strong> ${label.item}`);
-                if (label.sample) itemSample.push(`<strong>樣品:</strong> ${label.sample}`);
+                let itemSample = [label.item ? `<strong>Item:</strong> ${label.item}` : '', label.sample ? `<strong>樣品:</strong> ${label.sample}` : ''].filter(Boolean);
                 if (itemSample.length > 0) lines.push(`<div>${itemSample.join(" | ")}</div>`);
-                
                 if (label.conc) lines.push(`<div><strong>濃度:</strong> ${label.conc}</div>`);
                 if (name) lines.push(`<div><strong>人員:</strong> ${name}</div>`);
                 if (dateHtmlLarge) lines.push(dateHtmlLarge);
-                
-                labelDiv.innerHTML = lines.join("");
             } else {
-                let lines = []; 
                 if (code) lines.push(`<div><strong>${code}</strong></div>`);
-                
-                let itemSampleSmall = [];
-                if (label.item) itemSampleSmall.push(label.item);
-                if (label.sample) itemSampleSmall.push(label.sample);
+                let itemSampleSmall = [label.item, label.sample].filter(Boolean);
                 if (itemSampleSmall.length > 0) lines.push(`<div>${itemSampleSmall.join(" - ")}</div>`);
-                
                 if (label.conc) lines.push(`<div>${label.conc}</div>`);
                 if (name) lines.push(`<div>人員: ${name}</div>`);
                 if (dateHtmlSmall) lines.push(dateHtmlSmall);
-
-                labelDiv.innerHTML = lines.join("");
             }
+            labelDiv.innerHTML = lines.join("");
 
-            const delBtn = document.createElement("button");
-            delBtn.innerHTML = "✖";
-            delBtn.className = "btn-delete hide-on-print";
+            const delBtn = document.createElement("button"); delBtn.innerHTML = "✖"; delBtn.className = "btn-delete hide-on-print";
             delBtn.onclick = function() { removeSingleLabel(index); };
-            labelDiv.appendChild(delBtn);
-
-            printArea.appendChild(labelDiv);
+            labelDiv.appendChild(delBtn); printArea.appendChild(labelDiv);
         });
     }
 
-    // 🖨️ 電腦版：呼叫內建列印
     function printLabels() {
-        if(globalLabels.length === 0) {
-            alert("⚠️ 預覽區目前沒有標籤喔！請先加入標籤再列印。");
-            return;
-        }
+        if(globalLabels.length === 0) return alert("⚠️ 預覽區沒有標籤喔！");
         window.print();
     }
 
-    // 📄 手機版：強制背景生成精準 PDF 並下載 (繞過 Apple 限制)
-    function downloadPDFMobile() {
-        if(globalLabels.length === 0) {
-            alert("⚠️ 預覽區目前沒有標籤喔！請先加入標籤再列印。");
-            return;
-        }
-
-        const btnPdf = document.getElementById("btnPdfMobile");
-        const originalText = btnPdf.innerHTML;
-        btnPdf.innerHTML = "⏳ 產生中...";
-        btnPdf.disabled = true;
-
-        const width = parseFloat(document.getElementById("labelWidth").value);
-        const height = parseFloat(document.getElementById("labelHeight").value);
-        const code = document.getElementById("code").value || "Lab";
-        const count = globalLabels.length;
-        
-        // 建立隱形暫存區，確保每一張標籤都被強制換頁
-        const wrapper = document.createElement('div');
-        wrapper.style.position = 'absolute';
-        wrapper.style.left = '-9999px';
-        wrapper.style.top = '0';
-        wrapper.style.background = 'white';
-        
-        const printArea = document.getElementById("printArea");
-        const boxes = printArea.querySelectorAll('.label-box');
-
-        boxes.forEach((box, index) => {
-            if (index > 0) {
-                const breakDiv = document.createElement('div');
-                breakDiv.classList.add('html2pdf__page-break'); 
-                wrapper.appendChild(breakDiv);
-            }
-            const clone = box.cloneNode(true);
-            clone.style.border = "none"; 
-            clone.style.margin = "0";
-            clone.style.width = width + "mm";
-            clone.style.height = height + "mm"; 
-            clone.style.maxHeight = height + "mm"; 
-            clone.style.overflow = "hidden"; 
+    // 🌟 解析超級壓縮碼的共用核心
+    function decodeAndImportQR(qrData) {
+        try {
+            const decodedString = decodeURIComponent(qrData);
+            let imported = [];
             
-            // 把紅叉叉從 PDF 裡拔掉
-            const delBtn = clone.querySelector('.btn-delete');
-            if(delBtn) delBtn.remove();
+            if (decodedString.startsWith("[")) {
+                imported = JSON.parse(decodedString);
+                if(imported.length > 0 && Array.isArray(imported[0])) {
+                    imported = imported.map(arr => ({ item: arr[0], sample: arr[1], conc: arr[2] }));
+                }
+            } else {
+                imported = decodedString.split("~").map(row => {
+                    const parts = row.split("|");
+                    return { item: parts[0]||"", sample: parts[1]||"", conc: parts[2]||"" };
+                });
+            }
+            
+            if (Array.isArray(imported) && imported.length > 0) {
+                globalLabels = globalLabels.concat(imported);
+                renderPreview();
+                alert(`✅ 成功掃描，已匯入 ${imported.length} 張標籤！`);
+                return true; // 成功
+            }
+        } catch(err) { 
+            console.error(err);
+        }
+        return false; // 失敗
+    }
 
-            wrapper.appendChild(clone);
-        });
+    /* =========================================
+       下面是 QR / JSON / 相機的檔案傳輸功能區
+    ========================================= */
 
-        document.body.appendChild(wrapper);
+    function generateQR() {
+        if(globalLabels.length === 0) return alert("⚠️ 沒有標籤可產生 QR Code！");
+        const compressedData = globalLabels.map(l => `${l.item||""}|${l.sample||""}|${l.conc||""}`).join("~");
+        const safeData = encodeURIComponent(compressedData);
+        if(safeData.length > 2000) return alert("⚠️ 標籤過多，請改用「導出 JSON 檔」。");
+        document.getElementById("qrModal").style.display = "flex";
+        new QRious({ element: document.getElementById("qrCanvas"), value: safeData, size: 350, level: 'L' });
+    }
+    function closeQR() { document.getElementById("qrModal").style.display = "none"; }
 
-        const opt = {
-            margin: 0,
-            filename: `${code}_共${count}張_標籤.pdf`,
-            image: { type: 'jpeg', quality: 1 },
-            html2canvas: { scale: 4, useCORS: true, scrollY: 0 }, 
-            jsPDF: { unit: 'mm', format: [width, height], orientation: width > height ? 'landscape' : 'portrait' }
+    function exportJSON() {
+        if(globalLabels.length === 0) return alert("⚠️ 無標籤可匯出！");
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalLabels));
+        const a = document.createElement('a'); a.href = dataStr; a.download = `LabLabels_${document.getElementById("code").value || "export"}.json`;
+        document.body.appendChild(a); a.click(); a.remove();
+    }
+    function importJSON(event) {
+        const file = event.target.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const imported = JSON.parse(e.target.result);
+                if (Array.isArray(imported)) { globalLabels = globalLabels.concat(imported); renderPreview(); alert(`✅ 成功匯入 ${imported.length} 張標籤！`); }
+            } catch(err) { alert("❌ JSON 格式錯誤！"); }
         };
+        reader.readAsText(file); event.target.value = ''; 
+    }
 
-        // 啟動轉換
-        html2pdf().set(opt).from(wrapper).save().then(() => {
-            document.body.removeChild(wrapper);
-            btnPdf.innerHTML = originalText;
-            btnPdf.disabled = false;
-        }).catch(err => {
-            alert("產生 PDF 時發生錯誤：" + err);
-            document.body.removeChild(wrapper);
-            btnPdf.innerHTML = originalText;
-            btnPdf.disabled = false;
-        });
+    function readQRImage(event) {
+        const file = event.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+                canvas.width = img.width; canvas.height = img.height;
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "attemptBoth" });
+                
+                if (code) {
+                    if(!decodeAndImportQR(code.data)) alert("❌ 解析失敗，內容不符。");
+                } else { alert("❌ 解析不到 QR Code！請確保條碼清晰。"); }
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file); event.target.value = '';
+    }
+
+    // 📹 實時鏡頭掃描核心邏輯
+    function startScanner() {
+        const video = document.getElementById("videoElement");
+        const modal = document.getElementById("scannerModal");
+        
+        // 要求相機權限，優先使用後置鏡頭(或外接 WebCam)
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+            .then(function(stream) {
+                scanningActive = true;
+                videoStream = stream;
+                video.srcObject = stream;
+                video.setAttribute("playsinline", true); // iOS Safari 必需
+                video.play();
+                modal.style.display = "flex";
+                requestAnimationFrame(tick);
+            })
+            .catch(function(err) {
+                alert("❌ 無法開啟相機，請確認電腦有連接視訊鏡頭，並允許瀏覽器存取相機權限！");
+                console.error(err);
+            });
+    }
+
+    function stopScanner() {
+        scanningActive = false;
+        if(videoStream) {
+            videoStream.getTracks().forEach(track => track.stop());
+        }
+        document.getElementById("scannerModal").style.display = "none";
+    }
+
+    function tick() {
+        if (!scanningActive) return;
+        const video = document.getElementById("videoElement");
+        
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            // 在背景建立一塊畫布來擷取當下鏡頭畫面
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            
+            // 丟給 jsQR 解析，不要倒置減少運算量以提升流暢度
+            const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
+            
+            if (code) {
+                // 掃描成功！嘗試解析資料
+                if(decodeAndImportQR(code.data)) {
+                    stopScanner(); // 解析成功就關閉鏡頭
+                    return; 
+                }
+            }
+        }
+        // 如果沒掃到，就一直循環抓取下一幀畫面
+        requestAnimationFrame(tick);
     }
 </script>
 
