@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>實驗室標籤旗艦系統</title>
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style id="dynamicPageSize"></style>
 
     <style>
@@ -41,11 +42,13 @@
         .bg-acc { background: #c0392b; } .bg-prec { background: #27ae60; } .bg-stab { background: #d35400; } .bg-lim { background: #7f8c8d; }
         .bg-rt1 { background: #16a085; } .bg-rt2 { background: #2980b9; } .bg-rt3 { background: #8e44ad; } .bg-rt4 { background: #f39c12; }
 
-        /* 底部主要按鈕 */
-        .action-group { display: flex; gap: 8px; margin-top: 15px; border-top: 2px dashed #eee; padding-top: 15px;}
-        .btn-action { flex: 1; padding: 12px 4px; color: #fff; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; }
+        /* 底部主要按鈕 (拆成電腦與手機專用) */
+        .action-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; border-top: 2px dashed #eee; padding-top: 15px;}
+        .btn-action { flex: 1 1 45%; padding: 12px 4px; color: #fff; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; }
         .btn-action:active { transform: scale(0.97); }
-        .btn-add { background-color: #3498db; } .btn-print { background-color: #2ecc71; } .btn-clear { background-color: #e74c3c; }
+        .btn-print { background-color: #2ecc71; } 
+        .btn-pdf { background-color: #e67e22; }
+        .btn-clear { background-color: #e74c3c; flex: 1 1 100%; margin-bottom: 5px; }
 
         /* 標籤預覽區 */
         #printArea { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 15px; }
@@ -136,7 +139,7 @@
             </div>
             <div class="form-group"><label>💧 濃度</label><input type="text" id="conc" placeholder="例如：10 ppm"></div>
             
-            <button class="btn-action btn-add" style="width: 100%; margin-top: 10px;" onclick="addCustomLabel()">➕ 加入預覽列</button>
+            <button class="btn-action" style="width: 100%; margin-top: 10px; background-color: #3498db;" onclick="addCustomLabel()">➕ 加入預覽列</button>
         </div>
 
         <div id="tab2" class="tab-content">
@@ -171,10 +174,11 @@
 
         <div class="action-group">
             <button class="btn-action btn-clear" onclick="clearPreview()">🗑️ 全部清空</button>
-            <button class="btn-action btn-print" onclick="printLabels()" style="flex: 2;">🖨️ 呼叫列印 (含PDF)</button>
+            <button class="btn-action btn-print" onclick="printLabels()">🖨️ 電腦直接列印</button>
+            <button class="btn-action btn-pdf" id="btnPdfMobile" onclick="downloadPDFMobile()">📄 手機存 PDF</button>
         </div>
         <div style="text-align: center; font-size: 12px; color: #7f8c8d; margin-top: 8px;">
-            ⚠️ 列印 PDF 時，紙張勿選 A4，邊界選「無」。
+            💡 手機請按「存 PDF」，電腦請按「直接列印」
         </div>
     </div> <div id="printArea"></div>
 </div>
@@ -309,53 +313,38 @@
         renderPreview();
     }
 
-    // 🧪 分頁 3: 日常檢驗邏輯
+    // 🧪 分頁 3: 日常檢驗
     function addRoutine(itemName, defaultSaCount, askResolution = true) {
         let inputs = [];
-
-        // 1. 詢問 Resolution
         if (askResolution) {
             if (confirm(`【${itemName}】本次檢驗需要配製 Resolution 嗎？\n(按確定加入，按取消跳過)`)) {
                 let resStock = prompt(`請輸入 Resolution stock 有幾瓶？\n(若無請填 0)`, "1");
-                if (resStock === null) return; // 按取消直接中斷
-                for(let i=1; i<=parseInt(resStock||0); i++) {
-                    inputs.push({item: itemName, sample: `Resolution stock ${i}`, conc: ""});
-                }
+                if (resStock === null) return; 
+                for(let i=1; i<=parseInt(resStock||0); i++) inputs.push({item: itemName, sample: `Resolution stock ${i}`, conc: ""});
                 inputs.push({item: itemName, sample: "Resolution", conc: ""});
             }
         }
-
-        // 2. 詢問 STD Stock
         let stdStock = prompt(`【${itemName}】請輸入 STD stock 有幾瓶？\n(若無請填 0)`, "1");
         if (stdStock === null) return;
-        for(let i=1; i<=parseInt(stdStock||0); i++) {
-            inputs.push({item: itemName, sample: `STD stock ${i}`, conc: ""});
-        }
+        for(let i=1; i<=parseInt(stdStock||0); i++) inputs.push({item: itemName, sample: `STD stock ${i}`, conc: ""});
         inputs.push({item: itemName, sample: "STD", conc: ""});
 
-        // 3. 詢問 Sa Stock
         let saStock = prompt(`【${itemName}】請輸入 Sa stock 有幾瓶？\n(若無請填 0)`, "1");
         if (saStock === null) return;
-        for(let i=1; i<=parseInt(saStock||0); i++) {
-            inputs.push({item: itemName, sample: `Sa stock ${i}`, conc: ""});
-        }
+        for(let i=1; i<=parseInt(saStock||0); i++) inputs.push({item: itemName, sample: `Sa stock ${i}`, conc: ""});
 
-        // 4. 詢問最終 Sa 瓶數 (帶入預設值，允許修改)
         let saFinalCount = prompt(`【${itemName}】請確認最終樣品 (Sa) 有幾支？\n(若需修改請直接更改數字)`, defaultSaCount);
         if (saFinalCount === null) return;
         let count = parseInt(saFinalCount||defaultSaCount);
         
         for(let i=1; i<=count; i++) {
-            // 如果只有 1 張 Sa，可能只需標示 Sa，但為求統一辨識，這裡一樣編號，或者 ID 特例處理
             let sampleStr = (count === 1 && itemName === "ID") ? "Sa" : `Sa${i}`;
             inputs.push({item: itemName, sample: sampleStr, conc: ""});
         }
-
         globalLabels.push(...inputs);
         renderPreview();
     }
 
-    // 🗑️ 全部清空
     function clearPreview() {
         if(confirm("確定要清空所有已經加入的標籤嗎？")) {
             globalLabels = [];
@@ -363,7 +352,6 @@
         }
     }
 
-    // ❌ 單張刪除
     function removeSingleLabel(index) {
         globalLabels.splice(index, 1);
         renderPreview(); 
@@ -402,7 +390,6 @@
             dateHtmlSmall = `<div>${combinedDates}</div>`;
         }
 
-        // 🌟 最上方總張數 (加上 hide-on-print 確保不會被印出來)
         if(globalLabels.length > 0) {
             const countDiv = document.createElement("div");
             countDiv.className = "hide-on-print"; 
@@ -420,7 +407,6 @@
             labelDiv.style.padding = padding;
             labelDiv.style.lineHeight = lineHeight;
 
-            // --- 寫入標籤文字 ---
             if (!isCompact) {
                 let lines = []; 
                 if (code) lines.push(`<div><strong>代號/批號:</strong> ${code}</div>`);
@@ -451,7 +437,6 @@
                 labelDiv.innerHTML = lines.join("");
             }
 
-            // --- 掛上刪除小叉叉 ---
             const delBtn = document.createElement("button");
             delBtn.innerHTML = "✖";
             delBtn.className = "btn-delete hide-on-print";
@@ -462,12 +447,84 @@
         });
     }
 
+    // 🖨️ 電腦版：呼叫內建列印
     function printLabels() {
         if(globalLabels.length === 0) {
             alert("⚠️ 預覽區目前沒有標籤喔！請先加入標籤再列印。");
             return;
         }
         window.print();
+    }
+
+    // 📄 手機版：強制背景生成精準 PDF 並下載 (繞過 Apple 限制)
+    function downloadPDFMobile() {
+        if(globalLabels.length === 0) {
+            alert("⚠️ 預覽區目前沒有標籤喔！請先加入標籤再列印。");
+            return;
+        }
+
+        const btnPdf = document.getElementById("btnPdfMobile");
+        const originalText = btnPdf.innerHTML;
+        btnPdf.innerHTML = "⏳ 產生中...";
+        btnPdf.disabled = true;
+
+        const width = parseFloat(document.getElementById("labelWidth").value);
+        const height = parseFloat(document.getElementById("labelHeight").value);
+        const code = document.getElementById("code").value || "Lab";
+        const count = globalLabels.length;
+        
+        // 建立隱形暫存區，確保每一張標籤都被強制換頁
+        const wrapper = document.createElement('div');
+        wrapper.style.position = 'absolute';
+        wrapper.style.left = '-9999px';
+        wrapper.style.top = '0';
+        wrapper.style.background = 'white';
+        
+        const printArea = document.getElementById("printArea");
+        const boxes = printArea.querySelectorAll('.label-box');
+
+        boxes.forEach((box, index) => {
+            if (index > 0) {
+                const breakDiv = document.createElement('div');
+                breakDiv.classList.add('html2pdf__page-break'); 
+                wrapper.appendChild(breakDiv);
+            }
+            const clone = box.cloneNode(true);
+            clone.style.border = "none"; 
+            clone.style.margin = "0";
+            clone.style.width = width + "mm";
+            clone.style.height = height + "mm"; 
+            clone.style.maxHeight = height + "mm"; 
+            clone.style.overflow = "hidden"; 
+            
+            // 把紅叉叉從 PDF 裡拔掉
+            const delBtn = clone.querySelector('.btn-delete');
+            if(delBtn) delBtn.remove();
+
+            wrapper.appendChild(clone);
+        });
+
+        document.body.appendChild(wrapper);
+
+        const opt = {
+            margin: 0,
+            filename: `${code}_共${count}張_標籤.pdf`,
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 4, useCORS: true, scrollY: 0 }, 
+            jsPDF: { unit: 'mm', format: [width, height], orientation: width > height ? 'landscape' : 'portrait' }
+        };
+
+        // 啟動轉換
+        html2pdf().set(opt).from(wrapper).save().then(() => {
+            document.body.removeChild(wrapper);
+            btnPdf.innerHTML = originalText;
+            btnPdf.disabled = false;
+        }).catch(err => {
+            alert("產生 PDF 時發生錯誤：" + err);
+            document.body.removeChild(wrapper);
+            btnPdf.innerHTML = originalText;
+            btnPdf.disabled = false;
+        });
     }
 </script>
 
